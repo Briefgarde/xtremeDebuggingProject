@@ -1,5 +1,6 @@
 package ch.hearc.cafheg.business.versements;
 
+import ch.hearc.cafheg.business.allocations.Canton;
 import ch.hearc.cafheg.business.allocations.NoAVS;
 
 public class Enfant {
@@ -8,10 +9,19 @@ public class Enfant {
   private final String nom;
   private final String prenom;
 
+  private Canton canton;
   public Enfant(NoAVS noAVS, String nom, String prenom) {
     this.noAVS = noAVS;
     this.nom = nom;
     this.prenom = prenom;
+  }
+
+  public Canton getCanton() {
+    return canton;
+  }
+
+  public void setCanton(Canton canton) {
+    this.canton = canton;
   }
 
   public NoAVS getNoAVS() {

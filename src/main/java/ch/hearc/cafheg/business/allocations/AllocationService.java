@@ -32,6 +32,22 @@ public class AllocationService {
     return allocationMapper.findAll();
   }
 
+  /*
+  * List of all parameters defined in the tests :
+  * parent1ActiviteLucrative
+  * parent2ActiviteLucrative => allocataire.isActive
+  * parent1WithParentalAuthority
+  * parent2WithParentalAuthority
+  * parentsEnsemble => famille.parentsTogether
+  * enfantResidence => enfant.canton
+  * P1WorkInChildCanton => parent1WorkInChildCanton
+  * P2WorkInChildCanton => famille.parent2WorkInChildCanton
+  * P1Salaried
+  * P2Salaried
+  * parent1Salaire
+  * parent2Salaire
+  * */
+
   public String getParentDroitAllocation(Map<String, Object> parameters) {
     System.out.println("Déterminer quel parent a le droit aux allocations");
     String eR = (String)parameters.getOrDefault("enfantResidence", "");
