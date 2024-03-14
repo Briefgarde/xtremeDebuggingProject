@@ -3,11 +3,10 @@ package ch.hearc.cafheg.business.allocations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-import ch.hearc.cafheg.business.common.Montant;
+import ch.hearc.cafheg.business.versements.Enfant;
 import ch.hearc.cafheg.infrastructure.persistance.AllocataireMapper;
 import ch.hearc.cafheg.infrastructure.persistance.AllocationMapper;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.*;
 
 import org.junit.jupiter.api.Assertions;
@@ -26,12 +25,21 @@ class AllocationServiceTest {
   private AllocataireMapper allocataireMapper;
   private AllocationMapper allocationMapper;
 
+  private Famille famille;
+
   @BeforeEach
   void setUp() {
     allocataireMapper = Mockito.mock(AllocataireMapper.class);
     allocationMapper = Mockito.mock(AllocationMapper.class);
 
     allocationService = new AllocationService(allocataireMapper, allocationMapper);
+    // everything is set as true, so only things that needs to be set as false needs to changed
+    // parents and kids are all in Neuchatel
+    Allocataire parent1 = new Allocataire(new NoAVS("parent1"), "Doe", "John", true, true, true, BigDecimal.valueOf(10000), Canton.NE);
+    Allocataire parent2 = new Allocataire(new NoAVS("parent2"), "Doe", "Jane", true, true, true, BigDecimal.valueOf(10000), Canton.NE);
+    Enfant enfant = new Enfant(new NoAVS("enfant1"), "Doe", "Child", Canton.NE);
+    famille = new Famille(parent1, parent2, enfant, true, true, true);
+
   }
 //
 //  @Test
@@ -75,54 +83,64 @@ class AllocationServiceTest {
 //  }
 
   @Test
-  @DisplayName("If parent 1 is active and not parent 2, should be P1")
+  @DisplayName("test a : If parent 1 is active and not parent 2, should be P1")
   public void getParentDroitAllocation_GivenParent1Active_ShouldReturnParent1() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
     parameters.put("parent2ActiviteLucrative", false);
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    famille.parent2.setActive(false);
 
+    String result = allocationService.getParentDroitAllocation(parameters);
     Assertions.assertEquals(PARENT_1, result);
   }
 
   @Test
-  @DisplayName("If parent 1 is NOT active and parent 2 IS, should be P2")
+  @DisplayName("test a 2 : If parent 1 is NOT active and parent 2 IS, should be P2")
   public void getParentDroitAllocation_GivenParent2Active_ShouldReturnParent2() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", false);
     parameters.put("parent2ActiviteLucrative", true);
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    famille.parent1.setActive(false);
 
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_2, result);
   }
 
   @Test
+  @DisplayName("Test b")
   public void getParentDroitAllocation_GivenParentsActive_and_P1_WithAuthority_ShouldBeP1() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
     parameters.put("parent2ActiviteLucrative", true);
     parameters.put("parent1WithParentalAuthority", true);
     parameters.put("parent2WithParentalAuthority", false);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+    famille.parent2.setParentalAuthority(false);
+
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_1, result);
   }
 
   @Test
+  @DisplayName("Test b, 2")
   public void getParentDroitAllocation_GivenParentsActive_and_P2_WithAuthority_ShouldBeP2() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
     parameters.put("parent2ActiviteLucrative", true);
     parameters.put("parent1WithParentalAuthority", false);
     parameters.put("parent2WithParentalAuthority", true);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+    famille.parent1.setParentalAuthority(false);
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_2, result);
   }
 
   @Test
+  @DisplayName("Test c")
   public void getParentDroitAllocation_GivenParentsSeparatedAndChildWithP1_ShouldBeP1() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -131,11 +149,16 @@ class AllocationServiceTest {
     parameters.put("parent2WithParentalAuthority", true);
     parameters.put("parentsEnsemble", false);
     parameters.put("enfantResidence", 1);
-    String result = allocationService.getParentDroitAllocation(parameters);
+    famille.setParentsTogether(false);
+    // need one more
+    famille.parent2.setLifeCanton(Canton.BE);
 
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_1, result);
   }
   @Test
+  @DisplayName("Test c 2")
   public void getParentDroitAllocation_GivenParentsSeparatedAndChildWithP2_ShouldBeP2() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -144,12 +167,18 @@ class AllocationServiceTest {
     parameters.put("parent2WithParentalAuthority", true);
     parameters.put("parentsEnsemble", false);
     parameters.put("enfantResidence", 2);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+    famille.setParentsTogether(false);
+    // need one more
+    famille.parent1.setLifeCanton(Canton.BE);
+
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_2, result);
   }
 
   @Test
+  @DisplayName("Test d")
   public void getParentDroitAllocation_GivenParentsTogetherAndP1WorkInSameCantonAsChild_ShouldBeP1() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -159,11 +188,14 @@ class AllocationServiceTest {
     parameters.put("parentsEnsemble", true);
     parameters.put("P1WorkInChildCanton", true);
     parameters.put("P2WorkInChildCanton", false);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+    famille.setParent2WorkInChildCanton(false);
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_1, result);
   }
   @Test
+  @DisplayName("Test d 2")
   public void getParentDroitAllocation_GivenParentsTogetherAndP2WorkInSameCantonAsChild_ShouldBeP2() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -173,44 +205,16 @@ class AllocationServiceTest {
     parameters.put("parentsEnsemble", true);
     parameters.put("P1WorkInChildCanton", false);
     parameters.put("P2WorkInChildCanton", true);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+    famille.setParent1WorkInChildCanton(false);
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_2, result);
   }
 
-  @Test
-  public void getParentDroitAllocation_GivenParentsTogetherAndBothWorkInCantonOfChildButP1IsRich_ShouldBeP1() {
-    Map<String, Object> parameters = new HashMap<>();
-    parameters.put("parent1ActiviteLucrative", true);
-    parameters.put("parent2ActiviteLucrative", true);
-    parameters.put("parent1WithParentalAuthority", true);
-    parameters.put("parent2WithParentalAuthority", true);
-    parameters.put("parentsEnsemble", true);
-    parameters.put("P1WorkInChildCanton", true);
-    parameters.put("P2WorkInChildCanton", true);
-    parameters.put("parent1Salaire", 10);
-    parameters.put("parent2Salaire", 5);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
-    assertEquals(PARENT_1, result);
-  }
   @Test
-  public void getParentDroitAllocation_GivenParentsTogetherAndBothWorkInCantonOfChildButP2IsRich_ShouldBeP2() {
-    Map<String, Object> parameters = new HashMap<>();
-    parameters.put("parent1ActiviteLucrative", true);
-    parameters.put("parent2ActiviteLucrative", true);
-    parameters.put("parent1WithParentalAuthority", true);
-    parameters.put("parent2WithParentalAuthority", true);
-    parameters.put("parentsEnsemble", true);
-    parameters.put("P1WorkInChildCanton", true);
-    parameters.put("P2WorkInChildCanton", true);
-    parameters.put("parent1Salaire", 10);
-    parameters.put("parent2Salaire", 15);
-    String result = allocationService.getParentDroitAllocation(parameters);
-
-    assertEquals(PARENT_2, result);
-  }
-  @Test
+  @DisplayName("Test e")
   public void getParentDroitAllocation_GivenParentsTogetherAndAreSalariedAndP2isRich_ShouldBeP2() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -224,11 +228,19 @@ class AllocationServiceTest {
     parameters.put("P2Salaried", true);
     parameters.put("parent1Salaire", 10);
     parameters.put("parent2Salaire", 15);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+    //famille.parent2WorkInChildCanton are both either to true or false, but not half
+    // otherwise it's test d
+    //that's a valid condition for test e and f
+
+    // test e1-2 are both salaried, so test on salaire.
+    famille.parent2.setSalaire(famille.parent1.getSalaire().multiply(BigDecimal.valueOf(2)));
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_2, result);
   }
   @Test
+  @DisplayName("Test e 2")
   public void getParentDroitAllocation_GivenParentsTogetherAndAreSalariedAndP1isRich_ShouldBeP1() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -242,12 +254,16 @@ class AllocationServiceTest {
     parameters.put("P2Salaried", true);
     parameters.put("parent1Salaire", 10);
     parameters.put("parent2Salaire", 5);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+
+    famille.parent2.setSalaire(famille.parent1.getSalaire().multiply(BigDecimal.valueOf(2)));
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_1, result);
   }
 
   @Test
+  @DisplayName("Test e 3")
   public void getParentDroitAllocation_GivenParentsTogetherAndP1IsSalaried_ShouldBeP1() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -259,10 +275,17 @@ class AllocationServiceTest {
     parameters.put("P2WorkInChildCanton", false);
     parameters.put("P1Salaried", true);
     parameters.put("P2Salaried", false);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+
+    //test e3-4 have only one parent salaried, so only test that.
+    famille.parent2.setSalaried(false);
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_1, result);
   }
+
+  @Test
+  @DisplayName("Test e 4")
   public void getParentDroitAllocation_GivenParentsTogetherAndP2IsSalaried_ShouldBeP2() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -274,12 +297,15 @@ class AllocationServiceTest {
     parameters.put("P2WorkInChildCanton", false);
     parameters.put("P1Salaried", false);
     parameters.put("P2Salaried", true);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+    famille.parent1.setSalaried(false);
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_2, result);
   }
 
   @Test
+  @DisplayName("Test f ")
   public void getParentDroitAllocation_GivenParentsTogetherAndAreIndependantAndP1isRich_ShouldBeP1() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -293,12 +319,17 @@ class AllocationServiceTest {
     parameters.put("P2Salaried", false);
     parameters.put("parent1Salaire", 10);
     parameters.put("parent2Salaire", 5);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+    famille.parent1.setSalaried(false);
+    famille.parent2.setSalaried(false);
+    famille.parent1.setSalaire(famille.parent1.getSalaire().multiply(BigDecimal.valueOf(2)));
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_1, result);
   }
 
   @Test
+  @DisplayName("Test f 2")
   public void getParentDroitAllocation_GivenParentsTogetherAndAreIndependantAndP2isRich_ShouldBeP2() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("parent1ActiviteLucrative", true);
@@ -312,8 +343,12 @@ class AllocationServiceTest {
     parameters.put("P2Salaried", false);
     parameters.put("parent1Salaire", 10);
     parameters.put("parent2Salaire", 15);
-    String result = allocationService.getParentDroitAllocation(parameters);
 
+    famille.parent1.setSalaried(false);
+    famille.parent2.setSalaried(false);
+    famille.parent2.setSalaire(famille.parent2.getSalaire().multiply(BigDecimal.valueOf(2)));
+
+    String result = allocationService.getParentDroitAllocation(parameters);
     assertEquals(PARENT_2, result);
   }
 
