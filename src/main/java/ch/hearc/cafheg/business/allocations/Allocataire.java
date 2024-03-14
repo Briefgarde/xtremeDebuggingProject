@@ -12,7 +12,11 @@ public class Allocataire {
 
   private boolean isSalaried;
 
+  private boolean parentalAuthority;
+
   private BigDecimal salaire;
+
+  private Canton lifeCanton;
 
   public Allocataire(NoAVS noAVS, String nom, String prenom) {
     this.noAVS = noAVS;
@@ -20,6 +24,24 @@ public class Allocataire {
     this.prenom = prenom;
   }
 
+  public Allocataire(NoAVS noAVS, String nom, String prenom, boolean isActive, boolean isSalaried, boolean parentalAuthority, BigDecimal salaire, Canton canton) {
+    this.noAVS = noAVS;
+    this.nom = nom;
+    this.prenom = prenom;
+    this.isActive = isActive;
+    this.isSalaried = isSalaried;
+    this.parentalAuthority = parentalAuthority;
+    this.salaire = salaire;
+    this.lifeCanton = canton;
+  }
+
+  public boolean getParentalAuthority() {
+    return parentalAuthority;
+  }
+
+  public void setParentalAuthority(boolean parentalAuthority) {
+    this.parentalAuthority = parentalAuthority;
+  }
   public String getNom() {
     return nom;
   }
@@ -54,5 +76,13 @@ public class Allocataire {
 
   public void setSalaire(BigDecimal salaire) {
     this.salaire = salaire;
+  }
+
+  public Canton getLifeCanton() {
+    return lifeCanton;
+  }
+
+  public void setLifeCanton(Canton lifeCanton) {
+    this.lifeCanton = lifeCanton;
   }
 }

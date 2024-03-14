@@ -16,6 +16,13 @@ public class Enfant {
     this.prenom = prenom;
   }
 
+  public Enfant(NoAVS noAVS, String nom, String prenom, Canton canton) {
+    this.noAVS = noAVS;
+    this.nom = nom;
+    this.prenom = prenom;
+    this.canton = canton;
+  }
+
   public Canton getCanton() {
     return canton;
   }

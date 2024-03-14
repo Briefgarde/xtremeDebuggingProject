@@ -7,7 +7,7 @@ import java.util.List;
 public class Famille {
     public Allocataire parent1;
     public Allocataire parent2;
-    public List<Enfant> enfantList;
+    public Enfant enfant;
 
     public boolean parentsTogether;
 
@@ -15,10 +15,19 @@ public class Famille {
 
     public boolean parent2WorkInChildCanton;
 
-    public Famille(Allocataire parent1, Allocataire parent2, List<Enfant> enfantList) {
+    public Famille(Allocataire parent1, Allocataire parent2, Enfant enfant) {
         this.parent1 = parent1;
         this.parent2 = parent2;
-        this.enfantList = enfantList;
+        this.enfant = enfant;
+    }
+
+    public Famille(Allocataire parent1, Allocataire parent2, Enfant enfant, boolean parentsTogether, boolean parent1WorkInChildCanton, boolean parent2WorkInChildCanton) {
+        this.parent1 = parent1;
+        this.parent2 = parent2;
+        this.enfant = enfant;
+        this.parentsTogether = parentsTogether;
+        this.parent1WorkInChildCanton = parent1WorkInChildCanton;
+        this.parent2WorkInChildCanton = parent2WorkInChildCanton;
     }
 
     public Famille(){}
@@ -39,12 +48,12 @@ public class Famille {
         this.parent2 = parent2;
     }
 
-    public List<Enfant> getEnfantList() {
-        return enfantList;
+    public Enfant getEnfant() {
+        return enfant;
     }
 
-    public void setEnfantList(List<Enfant> enfantList) {
-        this.enfantList = enfantList;
+    public void setEnfant(Enfant enfant) {
+        this.enfant = enfant;
     }
 
     public boolean isParentsTogether() {
