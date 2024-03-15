@@ -91,7 +91,7 @@ class AllocationServiceTest {
 
     famille.parent2.setActive(false);
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     Assertions.assertEquals(PARENT_1, result);
   }
 
@@ -104,7 +104,7 @@ class AllocationServiceTest {
 
     famille.parent1.setActive(false);
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_2, result);
   }
 
@@ -120,7 +120,7 @@ class AllocationServiceTest {
     famille.parent2.setParentalAuthority(false);
 
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_1, result);
   }
 
@@ -135,7 +135,7 @@ class AllocationServiceTest {
 
     famille.parent1.setParentalAuthority(false);
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_2, result);
   }
 
@@ -154,7 +154,7 @@ class AllocationServiceTest {
     famille.parent2.setLifeCanton(Canton.BE);
 
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_1, result);
   }
   @Test
@@ -173,7 +173,7 @@ class AllocationServiceTest {
     famille.parent1.setLifeCanton(Canton.BE);
 
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_2, result);
   }
 
@@ -191,7 +191,7 @@ class AllocationServiceTest {
 
     famille.setParent2WorkInChildCanton(false);
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_1, result);
   }
   @Test
@@ -208,7 +208,7 @@ class AllocationServiceTest {
 
     famille.setParent1WorkInChildCanton(false);
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_2, result);
   }
 
@@ -236,7 +236,7 @@ class AllocationServiceTest {
     // test e1-2 are both salaried, so test on salaire.
     famille.parent2.setSalaire(famille.parent1.getSalaire().multiply(BigDecimal.valueOf(2)));
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_2, result);
   }
   @Test
@@ -256,9 +256,9 @@ class AllocationServiceTest {
     parameters.put("parent2Salaire", 5);
 
 
-    famille.parent2.setSalaire(famille.parent1.getSalaire().multiply(BigDecimal.valueOf(2)));
+    famille.parent1.setSalaire(famille.parent1.getSalaire().multiply(BigDecimal.valueOf(2)));
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_1, result);
   }
 
@@ -280,7 +280,7 @@ class AllocationServiceTest {
     //test e3-4 have only one parent salaried, so only test that.
     famille.parent2.setSalaried(false);
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_1, result);
   }
 
@@ -300,7 +300,7 @@ class AllocationServiceTest {
 
     famille.parent1.setSalaried(false);
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_2, result);
   }
 
@@ -324,7 +324,7 @@ class AllocationServiceTest {
     famille.parent2.setSalaried(false);
     famille.parent1.setSalaire(famille.parent1.getSalaire().multiply(BigDecimal.valueOf(2)));
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_1, result);
   }
 
@@ -348,7 +348,7 @@ class AllocationServiceTest {
     famille.parent2.setSalaried(false);
     famille.parent2.setSalaire(famille.parent2.getSalaire().multiply(BigDecimal.valueOf(2)));
 
-    String result = allocationService.getParentDroitAllocation(parameters);
+    String result = allocationService.getParentDroitAllocation(famille);
     assertEquals(PARENT_2, result);
   }
 
@@ -359,7 +359,10 @@ class AllocationServiceTest {
     parameters.put("parent1ActiviteLucrative", false);
     parameters.put("parent2ActiviteLucrative", false);
 
+    famille.parent1.setActive(false);
+    famille.parent2.setActive(false);
+
     assertThrows(IllegalArgumentException.class,
-            ()-> allocationService.getParentDroitAllocation(parameters));
+            ()-> allocationService.getParentDroitAllocation(famille));
   }
 }

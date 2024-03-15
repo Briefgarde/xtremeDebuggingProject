@@ -79,12 +79,15 @@ public class AllocationService {
     return salaireP1.doubleValue() > salaireP2.doubleValue() ? PARENT_1 : PARENT_2;
   }
 
-  public String getParentDroitAllocation(Famille famille){
+  public String getParentDroitAllocation(Famille famille) throws IllegalArgumentException{
     Allocataire parent1 = famille.parent1;
     Allocataire parent2 = famille.parent2;
     Enfant enfant = famille.enfant;
 
-    if (parent1.isActive() && !parent2.isActive()){
+    if (!parent1.isActive() && !parent2.isActive()){
+      throw new IllegalArgumentException("Can't have two parents that don't work !");
+      // test for exception
+    } else if (parent1.isActive() && !parent2.isActive()){
       return PARENT_1;
     } else if (parent2.isActive() && !parent1.isActive()) {
       return PARENT_2; // test a done
@@ -115,8 +118,6 @@ public class AllocationService {
         // this is test f done, both parents are independant so test on salaire value
       }
     }
-
-
     return null;
   }
 }
