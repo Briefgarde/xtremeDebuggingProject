@@ -5,6 +5,9 @@ import static ch.hearc.cafheg.infrastructure.persistance.Database.inTransaction;
 import ch.hearc.cafheg.business.allocations.Allocataire;
 import ch.hearc.cafheg.business.allocations.Allocation;
 import ch.hearc.cafheg.business.allocations.AllocationService;
+import ch.hearc.cafheg.business.allocations.Canton;
+import ch.hearc.cafheg.business.allocations.Famille;
+import ch.hearc.cafheg.business.allocations.NoAVS;
 import ch.hearc.cafheg.business.versements.VersementService;
 import ch.hearc.cafheg.infrastructure.pdf.PDFExporter;
 import ch.hearc.cafheg.infrastructure.persistance.AllocataireMapper;
@@ -41,10 +44,41 @@ public class RESTController {
       "parent1Salaire" : 2500,
       "parent2Salaire" : 3000
   }
+
+  new body of the request with updated parameters
+  {
+    "parent1" : {
+      "noAVS" : "756.1234.5678.97",
+      "nom" : "Doe",
+      "prenom" : "John",
+      "isActive" : true,
+      "isSalaried" : true,
+      "parentalAuthority" : true,
+      "salaire" : 2500,
+      "lifeCanton" : "Neuchâtel"
+    },
+    "parent2" : {
+      "noAVS" : "756.1234.5678.98",
+      "nom" : "Doe",
+      "prenom" : "Jane",
+      "isActive" : true,
+      "isSalaried" : true,
+      "parentalAuthority" : true,
+      "salaire" : 3000,
+      "lifeCanton" : "Bienne"
+    },
+    "enfant" : {
+      "noAVS" : "756.1234.5678.99",
+      "nom" : "Doe",
+      "prenom" : "Jack",
+      "canton" : "Neuchâtel"
+    }
+  }
    */
   @PostMapping("/droits/quel-parent")
   public String getParentDroitAllocation(@RequestBody Map<String, Object> params) {
-    return inTransaction(() -> allocationService.getParentDroitAllocation(params));
+    Famille famille = new Famille(params);
+    return inTransaction(() -> allocationService.getParentDroitAllocation(famille));
   }
 
   @GetMapping("/allocataires")

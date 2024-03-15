@@ -35,7 +35,8 @@ public class Allocataire {
     this.isActive = (boolean) params.getOrDefault("isActive", true);
     this.isSalaried = (boolean) params.getOrDefault("isSalaried", true);
     this.parentalAuthority = (boolean) params.getOrDefault("parentalAuthority", true);
-    this.salaire = (BigDecimal) params.getOrDefault("salaire", BigDecimal.ZERO);
+    Integer salaireInt = (Integer) params.getOrDefault("salaire", 0);
+    this.salaire = BigDecimal.valueOf(salaireInt);
     this.lifeCanton = params.get("lifeCanton") != null ? Canton.fromValue((String) params.get("lifeCanton")) : null;
   }
 

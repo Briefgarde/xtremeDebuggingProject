@@ -57,28 +57,6 @@ public class AllocationService {
   * test f = Famille.parentsTogether=true AND parents.isSalaried = false THEN parent with big salary.
   * */
 
-  public String getParentDroitAllocation(Map<String, Object> parameters) {
-    System.out.println("Déterminer quel parent a le droit aux allocations");
-    String eR = (String)parameters.getOrDefault("enfantResidence", "");
-    Boolean p1AL = (Boolean)parameters.getOrDefault("parent1ActiviteLucrative", false);
-    String p1Residence = (String)parameters.getOrDefault("parent1Residence", "");
-    Boolean p2AL = (Boolean)parameters.getOrDefault("parent2ActiviteLucrative", false);
-    String p2Residence = (String)parameters.getOrDefault("parent2Residence", "");
-    Boolean pEnsemble = (Boolean)parameters.getOrDefault("parentsEnsemble", false);
-    Number salaireP1 = (Number) parameters.getOrDefault("parent1Salaire", BigDecimal.ZERO);
-    Number salaireP2 = (Number) parameters.getOrDefault("parent2Salaire", BigDecimal.ZERO);
-
-    if(p1AL && !p2AL) {
-      return PARENT_1;
-    }
-
-    if(p2AL && !p1AL) {
-      return PARENT_2;
-    }
-
-    return salaireP1.doubleValue() > salaireP2.doubleValue() ? PARENT_1 : PARENT_2;
-  }
-
   public String getParentDroitAllocation(Famille famille) throws IllegalArgumentException{
     Allocataire parent1 = famille.parent1;
     Allocataire parent2 = famille.parent2;
