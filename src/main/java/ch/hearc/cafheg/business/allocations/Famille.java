@@ -3,6 +3,7 @@ package ch.hearc.cafheg.business.allocations;
 import ch.hearc.cafheg.business.versements.Enfant;
 
 import java.util.List;
+import java.util.Map;
 
 public class Famille {
     public Allocataire parent1;
@@ -14,6 +15,16 @@ public class Famille {
     public boolean parent1WorkInChildCanton;
 
     public boolean parent2WorkInChildCanton;
+
+    //json constructor
+    public Famille(Map<String, Object> params){
+        this.parent1 = new Allocataire((Map<String, Object>) params.get("parent1"));
+        this.parent2 = new Allocataire((Map<String, Object>) params.get("parent2"));
+        this.enfant = new Enfant((Map<String, Object>) params.get("enfant"));
+        this.parentsTogether = (boolean) params.getOrDefault("parentsTogether", true);
+        this.parent1WorkInChildCanton = (boolean) params.getOrDefault("parent1WorkInChildCanton", true);
+        this.parent2WorkInChildCanton = (boolean) params.getOrDefault("parent2WorkInChildCanton", true);
+    }
 
     public Famille(Allocataire parent1, Allocataire parent2, Enfant enfant) {
         this.parent1 = parent1;
@@ -30,7 +41,7 @@ public class Famille {
         this.parent2WorkInChildCanton = parent2WorkInChildCanton;
     }
 
-    public Famille(){}
+
 
     public Allocataire getParent1() {
         return parent1;

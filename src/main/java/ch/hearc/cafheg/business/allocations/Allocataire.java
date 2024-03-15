@@ -1,6 +1,7 @@
 package ch.hearc.cafheg.business.allocations;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 public class Allocataire {
 
@@ -22,6 +23,20 @@ public class Allocataire {
     this.noAVS = noAVS;
     this.nom = nom;
     this.prenom = prenom;
+  }
+
+  //json contructor
+  public Allocataire(Map<String, Object> params){
+    // we extract every parameters of the map and set the values of the object
+    // if null, use true for boolean as default value
+    this.noAVS = params.get("noAVS") != null ? new NoAVS((String) params.get("noAVS")) : null;
+    this.nom = (String) params.get("nom");
+    this.prenom = (String) params.get("prenom");
+    this.isActive = (boolean) params.getOrDefault("isActive", true);
+    this.isSalaried = (boolean) params.getOrDefault("isSalaried", true);
+    this.parentalAuthority = (boolean) params.getOrDefault("parentalAuthority", true);
+    this.salaire = (BigDecimal) params.getOrDefault("salaire", BigDecimal.ZERO);
+    this.lifeCanton = params.get("lifeCanton") != null ? Canton.fromValue((String) params.get("lifeCanton")) : null;
   }
 
   public Allocataire(NoAVS noAVS, String nom, String prenom, boolean isActive, boolean isSalaried, boolean parentalAuthority, BigDecimal salaire, Canton canton) {
