@@ -14,6 +14,8 @@ import ch.hearc.cafheg.infrastructure.persistance.AllocataireMapper;
 import ch.hearc.cafheg.infrastructure.persistance.AllocationMapper;
 import ch.hearc.cafheg.infrastructure.persistance.EnfantMapper;
 import ch.hearc.cafheg.infrastructure.persistance.VersementMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +27,8 @@ public class RESTController {
 
   private final AllocationService allocationService;
   private final VersementService versementService;
+
+  private final Logger logger = LoggerFactory.getLogger(RESTController.class);
 
   public RESTController() {
     this.allocationService = new AllocationService(new AllocataireMapper(), new AllocationMapper());
@@ -77,6 +81,8 @@ public class RESTController {
    */
   @PostMapping("/droits/quel-parent")
   public String getParentDroitAllocation(@RequestBody Map<String, Object> params) {
+    logger.info("Accessed droit/quel-parent");
+    logger.info("Creating famille from {}", params);
     Famille famille = new Famille(params);
     return inTransaction(() -> allocationService.getParentDroitAllocation(famille));
   }
@@ -84,32 +90,45 @@ public class RESTController {
   @GetMapping("/allocataires")
   public List<Allocataire> allocataires(
       @RequestParam(value = "startsWith", required = false) String start) {
+    logger.info("Accessed GET /allocataires");
     return inTransaction(() -> allocationService.findAllAllocataires(start));
   }
 
+  @DeleteMapping("/allocataires/{id}")
+    public String deleteAllocataire(@PathVariable("id") int id) {
+        logger.info("Accessed DELETE /allocataires/{}", id);
+        return inTransaction(() -> allocationService.deleteAllocataireById(id));
+    }
+
+
   @GetMapping("/allocations")
   public List<Allocation> allocations() {
+    logger.info("Accessed GET /allocations");
     return inTransaction(allocationService::findAllocationsActuelles);
   }
 
   @GetMapping("/allocations/{year}/somme")
   public BigDecimal sommeAs(@PathVariable("year") int year) {
+    logger.info("Accessed /allocataires/{}/somme", year);
     return inTransaction(() -> versementService.findSommeAllocationParAnnee(year).getValue());
   }
 
   @GetMapping("/allocations-naissances/{year}/somme")
   public BigDecimal sommeAns(@PathVariable("year") int year) {
+    logger.info("Accessed /allocations-naissances/{}/somme", year);
     return inTransaction(
         () -> versementService.findSommeAllocationNaissanceParAnnee(year).getValue());
   }
 
   @GetMapping(value = "/allocataires/{allocataireId}/allocations", produces = MediaType.APPLICATION_PDF_VALUE)
   public byte[] pdfAllocations(@PathVariable("allocataireId") int allocataireId) {
+    logger.info("Accessed allocataires/{}/allocations", allocataireId);
     return inTransaction(() -> versementService.exportPDFAllocataire(allocataireId));
   }
 
   @GetMapping(value = "/allocataires/{allocataireId}/versements", produces = MediaType.APPLICATION_PDF_VALUE)
   public byte[] pdfVersements(@PathVariable("allocataireId") int allocataireId) {
+    logger.info("Accessed /allocataires/{allocataireId}/versements", allocataireId);
     return inTransaction(() -> versementService.exportPDFVersements(allocataireId));
   }
 }
