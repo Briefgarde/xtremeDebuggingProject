@@ -32,6 +32,11 @@ public class AllocationService {
     return allocataireMapper.deleteAllocataireById(id);
   }
 
+  public String updateAllocataireName(int id, String nom, String prenom) {
+    logger.debug("Updating allocataire with id {}", id);
+    return allocataireMapper.updateAllocataireName(nom, prenom, id);
+  }
+
 
 
   public List<Allocataire> findAllAllocataires(String likeNom) {

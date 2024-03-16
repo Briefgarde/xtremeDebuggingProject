@@ -95,10 +95,24 @@ public class RESTController {
   }
 
   @DeleteMapping("/allocataires/{id}")
-    public String deleteAllocataire(@PathVariable("id") int id) {
-        logger.info("Accessed DELETE /allocataires/{}", id);
-        return inTransaction(() -> allocationService.deleteAllocataireById(id));
-    }
+  public String deleteAllocataire(@PathVariable("id") int id) {
+    logger.info("Accessed DELETE /allocataires/{}", id);
+    return inTransaction(() -> allocationService.deleteAllocataireById(id));
+  }
+
+
+  /*
+  * Body of the request
+  * {
+  *	  "nom" : "",
+  *	  "prenom" : ""
+  * }
+  */
+  @PutMapping("/allocataires/{id}")
+  public String updateAllocataire(@PathVariable("id") int id, @RequestBody Map<String, String> body) {
+    logger.info("Accessed PUT /allocataires/{}", id);
+    return inTransaction(() -> allocationService.updateAllocataireName(id, body.get("nom"), body.get("prenom")));
+  }
 
 
   @GetMapping("/allocations")

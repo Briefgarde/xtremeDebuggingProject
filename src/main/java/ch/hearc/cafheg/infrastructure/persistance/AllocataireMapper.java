@@ -22,6 +22,8 @@ public class AllocataireMapper extends Mapper {
   private static final String QUERY_DELETE_WHERE_NUMERO = "DELETE FROM ALLOCATAIRES WHERE NUMERO = ?";
   private static final String QUERY_SELECT_ALL_VERSEMENTS_WHERE_NUMERO = "SELECT * FROM VERSEMENTS WHERE FK_ALLOCATAIRES = ?";
 
+  private static final String QUERY_UPDATE_WHERE_NUMERO = "UPDATE ALLOCATAIRES SET NOM = ?, PRENOM = ? WHERE NUMERO = ?";
+
 
   public List<Allocataire> findAll(String likeNom) {
     System.out.println("findAll() " + likeNom);
@@ -110,9 +112,39 @@ public class AllocataireMapper extends Mapper {
       logger.error("SQL exception", e);
       throw new RuntimeException(e);
     }
+  }
 
-
-
+  public String updateAllocataireName(String nom, String prenom, int id) {
+    // first, check if either name or surname are really different
+    // if not, do nothing
+    logger.info("Starting updateAllocataire {}, with new nom and prenom", id, nom, prenom);
+    Connection connection = activeJDBCConnection();
+    try {
+      PreparedStatement checkStatement = connection.prepareStatement(QUERY_FIND_WHERE_NUMERO);
+      checkStatement.setLong(1, id);
+      ResultSet resultSet = checkStatement.executeQuery();
+      resultSet.next();
+      if (resultSet.getString(2).equals(nom) && resultSet.getString(3).equals(prenom)) {
+        logger.info("Found name {}, and surname {}", resultSet.getString(2), resultSet.getString(3));
+        logger.info("Allocataire {} name and surname are the same, no need to update", id);
+        return "Allocataire " + id + " name and surname are the same, no need to update";
+      }
+      logger.info("Allocataire {} name and surname are different, updating", id);
+      PreparedStatement updateStatement = connection.prepareStatement(QUERY_UPDATE_WHERE_NUMERO);
+      updateStatement.setString(1, nom);
+      updateStatement.setString(2, prenom);
+      updateStatement.setLong(3, id);
+      int check = updateStatement.executeUpdate();
+        if (check == 0) {
+            logger.warn("Allocataire {} not found, error", id);
+            return "Allocataire " + id + " not found";
+        }
+        logger.info("Allocataire {} updated", id);
+        return "Allocataire " + id + " updated";
+    }catch (SQLException e){
+      logger.error("SQL exception", e);
+      throw new RuntimeException(e);
+    }
 
   }
 }
