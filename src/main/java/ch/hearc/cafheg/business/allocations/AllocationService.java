@@ -66,7 +66,6 @@ public class AllocationService {
   * Test a : test on Allocataire.isActive
   * test b : test on Allocataire.parentalAuthority
   * test c : test on Famille.parentsTogether=false AND which parent is the kid with
-  * test c is currently fucked
   * test d = Famille.parentsTogether=true AND Famille.parentXWorkInChildCanton
   * test e = Famille.parentsTogether=true AND one Allocataire.isSalaried (or both) THEN Allocataire with big salary
   * test f = Famille.parentsTogether=true AND parents.isSalaried = false THEN parent with big salary.
@@ -106,6 +105,10 @@ public class AllocationService {
       } else if(parent2.getLifeCanton() != enfant.getCanton() && parent1.getLifeCanton()==enfant.getCanton()){
         logger.debug("returned PARENT1");
         return PARENT_1;
+      } else {
+        IllegalArgumentException e = new IllegalArgumentException("Can't have two parents that don't work !");
+        logger.error("Incorrect, both parent can't work", e);
+        throw e;
       }
     } else {
       if (famille.isParent1WorkInChildCanton() && !famille.isParent2WorkInChildCanton()){
@@ -125,14 +128,16 @@ public class AllocationService {
       } else if (parent2.isSalaried() && !parent1.isSalaried()){
         logger.debug("returned PARENT2");
         return PARENT_2; // test e done
-      } else {
+      } else if (!parent1.isSalaried() && !parent2.isSalaried()){
         String parent =  (parent1.getSalaire().doubleValue() > parent2.getSalaire().doubleValue()) ? PARENT_1 : PARENT_2;
         logger.debug("returned {}", parent);
         return parent;
         // this is test f done, both parents are independant so test on salaire value
+      } else {
+        IllegalArgumentException e = new IllegalArgumentException("Incorrect argument");
+        logger.error("Incorrect arguments", e);
+        throw e;
       }
     }
-    logger.warn("returned null");
-    return null;
   }
 }
