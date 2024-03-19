@@ -2,6 +2,9 @@ package ch.hearc.cafheg.infrastructure.persistance;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.function.Supplier;
@@ -10,6 +13,8 @@ import javax.sql.DataSource;
 public class Database {
   /** Pool de connections JDBC */
   private static DataSource dataSource;
+
+  static Logger logger = LoggerFactory.getLogger(Database.class);
 
   /** Connection JDBC active par utilisateur/thread (ThreadLocal) */
   private static final ThreadLocal<Connection> connection = new ThreadLocal<>();
@@ -21,7 +26,9 @@ public class Database {
    */
   static Connection activeJDBCConnection() {
     if(connection.get() == null) {
-      throw new RuntimeException("Pas de connection JDBC active");
+      RuntimeException e = new RuntimeException("Pas de connection JDBC active");
+      logger.error("Pas de connection JDBC active", e);
+      throw e;
     }
     return connection.get();
   }
@@ -33,21 +40,22 @@ public class Database {
    * @return Le résultat de l'éxécution de la fonction
    */
   public static <T> T inTransaction(Supplier<T> inTransaction) {
-    System.out.println("inTransaction#start");
+    logger.info("Transaction start");
     try {
-      System.out.println("inTransaction#getConnection");
+      logger.info("Transaction : getConnection");
       connection.set(dataSource.getConnection());
       return inTransaction.get();
     } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
       try {
-        System.out.println("inTransaction#closeConnection");
+        logger.info("Transaction, close connection");
         connection.get().close();
       } catch (SQLException e) {
+        logger.error("SQL exception", e);
         throw new RuntimeException(e);
       }
-      System.out.println("inTransaction#end");
+      logger.info("Transaction end");
       connection.remove();
     }
   }

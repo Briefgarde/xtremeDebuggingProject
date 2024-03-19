@@ -1,9 +1,14 @@
 package ch.hearc.cafheg.business.allocations;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigDecimal;
 import java.util.Map;
 
 public class Allocataire {
+
+  static Logger logger = LoggerFactory.getLogger(Allocataire.class);
 
   private final NoAVS noAVS;
   private final String nom;
@@ -27,6 +32,7 @@ public class Allocataire {
 
   //json contructor
   public Allocataire(Map<String, Object> params){
+    logger.debug("Creating Allocataire from {}", params);
     // we extract every parameters of the map and set the values of the object
     // if null, use true for boolean as default value
     this.noAVS = params.get("noAVS") != null ? new NoAVS((String) params.get("noAVS")) : null;
@@ -38,6 +44,7 @@ public class Allocataire {
     Integer salaireInt = (Integer) params.getOrDefault("salaire", 0);
     this.salaire = BigDecimal.valueOf(salaireInt);
     this.lifeCanton = params.get("lifeCanton") != null ? Canton.fromValue((String) params.get("lifeCanton")) : null;
+    logger.debug("Created Allocataire : {}", this);
   }
 
   public Allocataire(NoAVS noAVS, String nom, String prenom, boolean isActive, boolean isSalaried, boolean parentalAuthority, BigDecimal salaire, Canton canton) {

@@ -134,8 +134,8 @@ public class AllocationService {
         return parent;
         // this is test f done, both parents are independant so test on salaire value
       } else {
-        IllegalArgumentException e = new IllegalArgumentException("Incorrect argument");
-        logger.error("Incorrect arguments", e);
+        IllegalArgumentException e = new IllegalArgumentException("Incorrect argument, the method couldn't find an answer");
+        logger.error("Incorrect argument, the method couldn't find an answer, throwing error", e);
         throw e;
       }
     }

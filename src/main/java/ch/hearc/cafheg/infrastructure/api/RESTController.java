@@ -82,7 +82,6 @@ public class RESTController {
   @PostMapping("/droits/quel-parent")
   public String getParentDroitAllocation(@RequestBody Map<String, Object> params) {
     logger.info("Accessed droit/quel-parent");
-    logger.info("Creating famille from {}", params);
     Famille famille = new Famille(params);
     return inTransaction(() -> allocationService.getParentDroitAllocation(famille));
   }
@@ -142,7 +141,7 @@ public class RESTController {
 
   @GetMapping(value = "/allocataires/{allocataireId}/versements", produces = MediaType.APPLICATION_PDF_VALUE)
   public byte[] pdfVersements(@PathVariable("allocataireId") int allocataireId) {
-    logger.info("Accessed /allocataires/{allocataireId}/versements", allocataireId);
+    logger.info("Accessed /allocataires/{}/versements", allocataireId);
     return inTransaction(() -> versementService.exportPDFVersements(allocataireId));
   }
 }
