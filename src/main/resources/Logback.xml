@@ -1,30 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Appender for debug level logs in all packages
-    After testing, this config is being read, it does pick up some stuff, but it also generate a button of error
-    Half of the class seems to be missing from the library in itself, I feel like the problem comes from the library itself
-    and the way it's imported. But without using a standard Maven project, switching it around and rebuilding it on solid ground is pretty tedious
-    So yeah, idk how to proceed.
-    The other File Appenders simply aren't working, those I didn't manage to make work at all.
-    -->
-    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
             <pattern>%black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable</pattern>
         </encoder>
     </appender>
-    <!-- Root logger for debug level logs in all packages -->
-    <root level="debug">
-        <appender-ref ref="Console" />
-    </root>
+    <logger name="ch" level="debug" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
 
 
 
 
     <property name="LOGS_PATH" value="./logs" />
     <timestamp key="timestamp" datePattern="yyyy-MM-dd"/>
-
-
-
     <!-- Appender for error level logs in services package -->
     <appender name="RollingFile-AppenderInfo" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -39,6 +29,7 @@
     <logger name="ch.hearc.cafheg.infrastructure" level="info">
         <appender-ref ref="RollingFile-AppenderInfo" />
     </logger>
+
 
     <appender name="File-AppenderError" class="ch.qos.logback.core.FileAppender">
         <file>${LOGS_PATH}/err.log</file>
