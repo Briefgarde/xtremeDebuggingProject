@@ -11,8 +11,6 @@
 
 
 
-
-
     <property name="LOGS_PATH" value="./logs" />
     <timestamp key="timestamp" datePattern="yyyy-MM-dd"/>
     <!-- Appender for error level logs in services package -->
@@ -41,6 +39,8 @@
     <logger name="ch" level="error">
         <appender-ref ref="File-AppenderError" />
     </logger>
+
+
 
 
 
