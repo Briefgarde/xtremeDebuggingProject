@@ -5,10 +5,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.function.Supplier;
-import javax.sql.DataSource;
 
 public class Database {
   /** Pool de connections JDBC */
@@ -24,7 +24,7 @@ public class Database {
    * active.
    * @return Connection JDBC active
    */
-  static Connection activeJDBCConnection() {
+  public static Connection activeJDBCConnection() {
     if(connection.get() == null) {
       RuntimeException e = new RuntimeException("Pas de connection JDBC active");
       logger.error("Pas de connection JDBC active", e);
@@ -68,12 +68,17 @@ public class Database {
    * Initialisation du pool de connections.
    */
   public void start() {
-    System.out.println("Initializing datasource");
+    logger.info("Initializing datasource");
     HikariConfig config = new HikariConfig();
     config.setJdbcUrl("jdbc:h2:mem:sample");
     config.setMaximumPoolSize(20);
     config.setDriverClassName("org.h2.Driver");
     dataSource = new HikariDataSource(config);
-    System.out.println("Datasource initialized");
+    try {
+      connection.set(dataSource.getConnection());
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    logger.info("Datasource initialized");
   }
 }
