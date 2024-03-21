@@ -54,8 +54,10 @@ public class MyTestsIT {
 
             logger.info("Set up done");
         } catch (DatabaseUnitException e) {
+            logger.error("DatabaseUnitException", e);
             throw new RuntimeException(e);
         } catch (SQLException e) {
+            logger.error("SQLException", e);
             throw new RuntimeException(e);
         }
     }
@@ -73,13 +75,16 @@ public class MyTestsIT {
             dataSet = DataSetTestService.loadDataSet("testDataDelete.xml"); // test on testDataDelete dataset
             expectedTable = dataSet.getTable("ALLOCATAIRES");
         } catch (DataSetException e) {
+            logger.error("DataSetException", e);
             throw new RuntimeException(e);
         } catch (SQLException e) {
+            logger.error("SQLException", e);
             throw new RuntimeException(e);
         }
         try {
             Assertion.assertEquals(expectedTable, actualData);
         } catch (DatabaseUnitException e) {
+            logger.error("DatabaseUnitException", e);
             throw new RuntimeException(e);
         }
     }
@@ -96,13 +101,16 @@ public class MyTestsIT {
             dataSet = DataSetTestService.loadDataSet("testDataUpdate.xml"); // test on testDataDelete dataset
             expectedTable = dataSet.getTable("ALLOCATAIRES");
         } catch (DataSetException e) {
+            logger.error("DataSetException", e);
             throw new RuntimeException(e);
         } catch (SQLException e) {
+            logger.error("SQLException", e);
             throw new RuntimeException(e);
         }
         try {
             Assertion.assertEquals(expectedTable, actualData);
         } catch (DatabaseUnitException e) {
+            logger.error("DatabaseUnitException", e);
             throw new RuntimeException(e);
         }
     }
