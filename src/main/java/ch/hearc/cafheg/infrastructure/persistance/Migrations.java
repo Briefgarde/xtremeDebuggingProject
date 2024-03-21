@@ -7,23 +7,14 @@ import org.flywaydb.core.Flyway;
  */
 public class Migrations {
 
-
-
   private final Database database;
-  private boolean forTest;
+  private final boolean forTest;
 
-  public Migrations(Database database) {
+  public Migrations(Database database, boolean forTest) {
     this.database = database;
-    this.forTest = false;
-  }
-
-  public boolean isForTest() {
-    return forTest;
-  }
-
-  public void setForTest(boolean forTest) {
     this.forTest = forTest;
   }
+
 
   /**
    * Exécution des migrations

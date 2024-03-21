@@ -26,7 +26,7 @@ public class Application extends SpringBootServletInitializer {
 
   private static void start() {
     Database database = new Database();
-    Migrations migrations = new Migrations(database);
+    Migrations migrations = new Migrations(database, false);
 
     database.start();
     migrations.start();
