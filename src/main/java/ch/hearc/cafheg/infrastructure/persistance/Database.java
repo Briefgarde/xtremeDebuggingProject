@@ -40,9 +40,9 @@ public class Database {
    * @return Le résultat de l'éxécution de la fonction
    */
   public static <T> T inTransaction(Supplier<T> inTransaction) {
-    logger.info("Transaction start");
+    logger.debug("Transaction start");
     try {
-      logger.info("Transaction : getConnection");
+      logger.debug("Transaction : getConnection");
       connection.set(dataSource.getConnection());
       return inTransaction.get();
     } catch (Exception e) {
@@ -50,13 +50,13 @@ public class Database {
       throw new RuntimeException(e);
     } finally {
       try {
-        logger.info("Transaction, close connection");
+        logger.debug("Transaction, close connection");
         connection.get().close();
       } catch (SQLException e) {
         logger.error("Transaction error when closing connection", e);
         throw new RuntimeException(e);
       }
-      logger.info("Transaction end");
+      logger.debug("Transaction end");
       connection.remove();
     }
   }
