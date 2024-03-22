@@ -46,13 +46,14 @@ public class Database {
       connection.set(dataSource.getConnection());
       return inTransaction.get();
     } catch (Exception e) {
+      logger.error("Transaction error when getting connection", e);
       throw new RuntimeException(e);
     } finally {
       try {
         logger.info("Transaction, close connection");
         connection.get().close();
       } catch (SQLException e) {
-        logger.error("SQL exception", e);
+        logger.error("Transaction error when closing connection", e);
         throw new RuntimeException(e);
       }
       logger.info("Transaction end");
@@ -77,6 +78,7 @@ public class Database {
     try {
       connection.set(dataSource.getConnection());
     } catch (SQLException e) {
+      logger.error("Error getting connection", e);
       throw new RuntimeException(e);
     }
     logger.info("Datasource initialized");

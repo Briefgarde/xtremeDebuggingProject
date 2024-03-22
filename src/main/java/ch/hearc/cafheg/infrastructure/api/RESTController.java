@@ -1,13 +1,9 @@
 package ch.hearc.cafheg.infrastructure.api;
 
-import static ch.hearc.cafheg.infrastructure.persistance.Database.inTransaction;
-
 import ch.hearc.cafheg.business.allocations.Allocataire;
 import ch.hearc.cafheg.business.allocations.Allocation;
 import ch.hearc.cafheg.business.allocations.AllocationService;
-import ch.hearc.cafheg.business.allocations.Canton;
 import ch.hearc.cafheg.business.allocations.Famille;
-import ch.hearc.cafheg.business.allocations.NoAVS;
 import ch.hearc.cafheg.business.versements.VersementService;
 import ch.hearc.cafheg.infrastructure.pdf.PDFExporter;
 import ch.hearc.cafheg.infrastructure.persistance.AllocataireMapper;
@@ -20,7 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+
+import static ch.hearc.cafheg.infrastructure.persistance.Database.inTransaction;
 
 @RestController
 public class RESTController {
@@ -122,26 +121,26 @@ public class RESTController {
 
   @GetMapping("/allocations/{year}/somme")
   public BigDecimal sommeAs(@PathVariable("year") int year) {
-    logger.info("Accessed /allocataires/{}/somme", year);
+    logger.info("Accessed GET /allocataires/{}/somme", year);
     return inTransaction(() -> versementService.findSommeAllocationParAnnee(year).getValue());
   }
 
   @GetMapping("/allocations-naissances/{year}/somme")
   public BigDecimal sommeAns(@PathVariable("year") int year) {
-    logger.info("Accessed /allocations-naissances/{}/somme", year);
+    logger.info("Accessed GET /allocations-naissances/{}/somme", year);
     return inTransaction(
         () -> versementService.findSommeAllocationNaissanceParAnnee(year).getValue());
   }
 
   @GetMapping(value = "/allocataires/{allocataireId}/allocations", produces = MediaType.APPLICATION_PDF_VALUE)
   public byte[] pdfAllocations(@PathVariable("allocataireId") int allocataireId) {
-    logger.info("Accessed allocataires/{}/allocations", allocataireId);
+    logger.info("Accessed GET  allocataires/{}/allocations", allocataireId);
     return inTransaction(() -> versementService.exportPDFAllocataire(allocataireId));
   }
 
   @GetMapping(value = "/allocataires/{allocataireId}/versements", produces = MediaType.APPLICATION_PDF_VALUE)
   public byte[] pdfVersements(@PathVariable("allocataireId") int allocataireId) {
-    logger.info("Accessed /allocataires/{}/versements", allocataireId);
+    logger.info("Accessed GET /allocataires/{}/versements", allocataireId);
     return inTransaction(() -> versementService.exportPDFVersements(allocataireId));
   }
 }

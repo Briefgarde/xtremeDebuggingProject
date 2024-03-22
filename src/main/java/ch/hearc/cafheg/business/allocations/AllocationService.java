@@ -6,9 +6,7 @@ import ch.hearc.cafheg.infrastructure.persistance.AllocationMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 public class AllocationService {
 
@@ -40,7 +38,7 @@ public class AllocationService {
 
 
   public List<Allocataire> findAllAllocataires(String likeNom) {
-    System.out.println("Rechercher tous les allocataires");
+    logger.debug("Rechercher tous les allocataire avec le nom {}", likeNom);
     return allocataireMapper.findAll(likeNom);
   }
 

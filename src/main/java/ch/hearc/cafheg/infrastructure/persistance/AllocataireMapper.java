@@ -26,62 +26,72 @@ public class AllocataireMapper extends Mapper {
 
 
   public List<Allocataire> findAll(String likeNom) {
-    System.out.println("findAll() " + likeNom);
+
+    logger.debug("findAll() {}", likeNom);
     Connection connection = activeJDBCConnection();
     try {
       PreparedStatement preparedStatement;
       if (likeNom == null) {
-        System.out.println("SQL: " + QUERY_FIND_ALL);
+
+        logger.info("SQL : {}", QUERY_FIND_ALL);
         preparedStatement = connection
             .prepareStatement(QUERY_FIND_ALL);
       } else {
 
-        System.out.println("SQL: " + QUERY_FIND_WHERE_NOM_LIKE);
+        logger.info("SQL : {}", QUERY_FIND_WHERE_NOM_LIKE);
         preparedStatement = connection
             .prepareStatement(QUERY_FIND_WHERE_NOM_LIKE);
         preparedStatement.setString(1, likeNom + "%");
+        logger.info("SQL : {}", preparedStatement.toString());
       }
-      System.out.println("Allocation d'un nouveau tableau");
+
+      logger.debug("Allocation d'un nouveau tableau");
       List<Allocataire> allocataires = new ArrayList<>();
 
-      System.out.println("Exécution de la requête");
+
+      logger.debug("Exécution de la requête");
       try (ResultSet resultSet = preparedStatement.executeQuery()) {
 
-        System.out.println("Allocataire mapping");
+
+        logger.debug("Itération sur le ResultSet");
         while (resultSet.next()) {
-          System.out.println("ResultSet#next");
+          logger.debug("ResultSet#next");
           allocataires
               .add(new Allocataire(new NoAVS(resultSet.getString(3)), resultSet.getString(2),
                   resultSet.getString(1)));
         }
       }
-      System.out.println("Allocataires trouvés " + allocataires.size());
+
+      logger.debug("Allocataires trouvés {}", allocataires.size());
       return allocataires;
     } catch (SQLException e) {
+      logger.error("Erreur lors de la recherche des allocataires findAll", e);
       throw new RuntimeException(e);
     }
   }
 
   public Allocataire findById(long id) {
-    System.out.println("findById() " + id);
+    logger.debug("findById() {}", id);
     Connection connection = activeJDBCConnection();
     try {
-      System.out.println("SQL:" + QUERY_FIND_WHERE_NUMERO);
+      logger.debug("SQL: {}", QUERY_FIND_WHERE_NUMERO);
       PreparedStatement preparedStatement = connection.prepareStatement(QUERY_FIND_WHERE_NUMERO);
       preparedStatement.setLong(1, id);
+      logger.info("SQL: {}", preparedStatement.toString());
       ResultSet resultSet = preparedStatement.executeQuery();
-      System.out.println("ResultSet#next");
+      logger.debug("ResultSet#next");
       resultSet.next();
-      System.out.println("Allocataire mapping");
+      logger.debug("Allocataire mapping");
       return new Allocataire(new NoAVS(resultSet.getString(1)),
           resultSet.getString(2), resultSet.getString(3));
     } catch (SQLException e) {
+      logger.error("Erreur lors de la recherche de l'allocataire findById", e);
       throw new RuntimeException(e);
     }
   }
 
   public String deleteAllocataireById(int id){
-    logger.info("starting deleteAllocataireById : {}", id);
+    logger.debug("starting deleteAllocataireById : {}", id);
     Connection connection = activeJDBCConnection();
     try {
       // first check if Allocataire id has versement linked to it.
@@ -109,7 +119,7 @@ public class AllocataireMapper extends Mapper {
       logger.info("Allocataire {} deleted", id);
       return "Allocataire " + id + " deleted";
     } catch (SQLException e) {
-      logger.error("SQL exception", e);
+      logger.error("Erreur lors de la suppression de l'allocataire deleteAllocataireById", e);
       throw new RuntimeException(e);
     }
   }
@@ -142,7 +152,7 @@ public class AllocataireMapper extends Mapper {
         logger.info("Allocataire {} updated", id);
         return "Allocataire " + id + " updated";
     }catch (SQLException e){
-      logger.error("SQL exception", e);
+      logger.error("Erreur lors de la mise à jour de l'allocataire updateAllocataireName", e);
       throw new RuntimeException(e);
     }
 
